@@ -1,41 +1,41 @@
-import { useState, useEffect } from 'react'
-import './App.css'
-import TopSongListItem from './components/TopSongListItem'
-import PlaylistCard from './components/PlaylistCard'
-import AuthModal from './components/AuthModal'
-import PlaylistsTab from './components/PlaylistsTab'
-import { useAuth } from './context/AuthContext'
+import { useState, useEffect } from 'react';
+import './App.css';
+import TopSongListItem from './components/TopSongListItem';
+import PlaylistCard from './components/PlaylistCard';
+import AuthModal from './components/AuthModal';
+import PlaylistsTab from './components/PlaylistsTab';
+import { useAuth } from './context/AuthContext';
 
 function App() {
-  const { user, loading: authLoading, login, register, logout } = useAuth()
-  const [activeTab, setActiveTab] = useState('discover')
-  const [authModalOpen, setAuthModalOpen] = useState(false)
-  const [songs, setSongs] = useState([])
-  const [playlists, setPlaylists] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [playlistsLoading, setPlaylistsLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [playlistsError, setPlaylistsError] = useState(null)
+  const { user, loading: authLoading, login, register, logout } = useAuth();
+  const [activeTab, setActiveTab] = useState('discover');
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [songs, setSongs] = useState([]);
+  const [playlists, setPlaylists] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [playlistsLoading, setPlaylistsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [playlistsError, setPlaylistsError] = useState(null);
 
   useEffect(() => {
-    if (!user && activeTab === 'playlists') setActiveTab('discover')
-  }, [user, activeTab])
+    if (!user && activeTab === 'playlists') setActiveTab('discover');
+  }, [user, activeTab]);
 
   useEffect(() => {
     fetch('/api/songs/popular')
       .then((res) => res.json())
       .then((data) => setSongs(data))
       .catch((err) => setError(err.message))
-      .finally(() => setLoading(false))
-  }, [])
+      .finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
     fetch('/api/playlists/latest')
       .then((res) => res.json())
       .then((data) => setPlaylists(data))
       .catch((err) => setPlaylistsError(err.message))
-      .finally(() => setPlaylistsLoading(false))
-  }, [])
+      .finally(() => setPlaylistsLoading(false));
+  }, []);
 
   return (
     <div className="homepage">
@@ -70,11 +70,7 @@ function App() {
           ) : user ? (
             <div className="nav-user">
               <span className="nav-user-email">{user.email}</span>
-              <button
-                type="button"
-                className="nav-logout"
-                onClick={logout}
-              >
+              <button type="button" className="nav-logout" onClick={logout}>
                 Log out
               </button>
             </div>
@@ -107,66 +103,74 @@ function App() {
           </section>
         ) : (
           <>
-        <section className="hero">
-          <p className="tagline">Music at your fingertips</p>
-          <p className="subtitle">
-            Discover artists, build playlists, and lose yourself in sound.
-          </p>
-          {!user && (
-            <button
-              className="cta"
-              type="button"
-              onClick={() => setAuthModalOpen(true)}
-            >
-              Get started
-            </button>
-          )}
-        </section>
+            <section className="hero">
+              <p className="tagline">Music at your fingertips</p>
+              <p className="subtitle">
+                Discover artists, build playlists, and lose yourself in sound.
+              </p>
+              {!user && (
+                <button
+                  className="cta"
+                  type="button"
+                  onClick={() => setAuthModalOpen(true)}
+                >
+                  Get started
+                </button>
+              )}
+            </section>
 
-        <section className="top-songs">
-          <div className="section-header">
-            <h2 className="section-title">Top 10 songs</h2>
-            <p className="section-subtitle">Most played this week</p>
-          </div>
-          {loading && <p className="songs-loading">Loading...</p>}
-          {error && <p className="songs-error">{error}</p>}
-          {!loading && !error && songs.length > 0 && (
-            <div className="songs-card">
-              <div className="songs-list-header">
-                <span className="col-rank">#</span>
-                <span className="col-info">Track</span>
-                <span className="col-meta">Time</span>
-                <span className="col-meta">Plays</span>
+            <section className="top-songs">
+              <div className="section-header">
+                <h2 className="section-title">Top 10 songs</h2>
+                <p className="section-subtitle">Most played this week</p>
               </div>
-              <ul className="songs-list">
-                {songs.map((song, i) => (
-                  <TopSongListItem key={song._id} song={song} rank={i + 1} />
-                ))}
-              </ul>
-            </div>
-          )}
-        </section>
+              {loading && <p className="songs-loading">Loading...</p>}
+              {error && <p className="songs-error">{error}</p>}
+              {!loading && !error && songs.length > 0 && (
+                <div className="songs-card">
+                  <div className="songs-list-header">
+                    <span className="col-rank">#</span>
+                    <span className="col-info">Track</span>
+                    <span className="col-meta">Time</span>
+                    <span className="col-meta">Plays</span>
+                  </div>
+                  <ul className="songs-list">
+                    {songs.map((song, i) => (
+                      <TopSongListItem
+                        key={song._id}
+                        song={song}
+                        rank={i + 1}
+                      />
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </section>
 
-        <section className="latest-playlists">
-          <div className="section-header">
-            <h2 className="section-title">Latest playlists</h2>
-            <p className="section-subtitle">Recently added</p>
-          </div>
-          {playlistsLoading && <p className="playlists-loading">Loading...</p>}
-          {playlistsError && <p className="playlists-error">{playlistsError}</p>}
-          {!playlistsLoading && !playlistsError && playlists.length > 0 && (
-            <div className="playlists-row">
-              {playlists.map((playlist) => (
-                <PlaylistCard key={playlist._id} playlist={playlist} />
-              ))}
-            </div>
-          )}
-        </section>
+            <section className="latest-playlists">
+              <div className="section-header">
+                <h2 className="section-title">Latest playlists</h2>
+                <p className="section-subtitle">Recently added</p>
+              </div>
+              {playlistsLoading && (
+                <p className="playlists-loading">Loading...</p>
+              )}
+              {playlistsError && (
+                <p className="playlists-error">{playlistsError}</p>
+              )}
+              {!playlistsLoading && !playlistsError && playlists.length > 0 && (
+                <div className="playlists-row">
+                  {playlists.map((playlist) => (
+                    <PlaylistCard key={playlist._id} playlist={playlist} />
+                  ))}
+                </div>
+              )}
+            </section>
           </>
         )}
       </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
