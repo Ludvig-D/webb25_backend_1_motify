@@ -6,7 +6,8 @@ const router = Router();
 
 router.get('/', async (req, res) => {
   try {
-    const songs = await Song.find().populate('artist', ['name', 'image'])
+    const songs = await Song.find()
+      .populate('artist', ['name', 'image'])
       .populate('album', 'title releaseDate');
     res.json(songs);
   } catch (err) {
@@ -17,7 +18,10 @@ router.get('/', async (req, res) => {
 
 router.get('/popular', async (req, res) => {
   try {
-    const songs = await Song.find().sort({ playcount: -1 }).limit(10).populate('artist', ['name', 'image'])
+    const songs = await Song.find()
+      .sort({ playcount: -1 })
+      .limit(10)
+      .populate('artist', ['name', 'image'])
       .populate('album', 'title releaseDate');
     res.json(songs);
   } catch (err) {
@@ -28,7 +32,8 @@ router.get('/popular', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
-    const song = await Song.findById(req.params.id).populate('artist', ['name', 'image'])
+    const song = await Song.findById(req.params.id)
+      .populate('artist', ['name', 'image'])
       .populate('album', 'title releaseDate');
     if (!song) {
       console.error('Song by ID: Song not found');
@@ -57,11 +62,11 @@ router.post('/', requireAuth, async (req, res) => {
 
 router.put('/:id', requireAuth, async (req, res) => {
   try {
-    const song = await Song.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    ).populate('artist', 'name')
+    const song = await Song.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    })
+      .populate('artist', 'name')
       .populate('album', 'title releaseDate');
     if (!song) {
       console.error('Update song: Song not found');

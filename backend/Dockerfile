@@ -5,9 +5,9 @@ RUN npm ci --omit=dev
 
 FROM base AS dev
 ENV NODE_ENV=development
-RUN npm ci --include=dev
+RUN npm ci 
 COPY . .
-CMD [ "npm", "run", "dev" ]
+CMD [ "node", "--watch", "index.js" ]
 
 FROM base AS prod
 ENV NODE_ENV=production

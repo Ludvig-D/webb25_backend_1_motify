@@ -25,7 +25,10 @@ function App() {
     fetch('/api/songs/popular')
       .then((res) => res.json())
       .then((data) => setSongs(data))
-      .catch((err) => setError(err.message))
+      .catch((err) => {
+        console.log(err);
+        setError(err.message);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -126,7 +129,7 @@ function App() {
               </div>
               {loading && <p className="songs-loading">Loading...</p>}
               {error && <p className="songs-error">{error}</p>}
-              {!loading && !error && songs.length > 0 && (
+              {!loading && !error && songs?.length > 0 && (
                 <div className="songs-card">
                   <div className="songs-list-header">
                     <span className="col-rank">#</span>
@@ -158,13 +161,15 @@ function App() {
               {playlistsError && (
                 <p className="playlists-error">{playlistsError}</p>
               )}
-              {!playlistsLoading && !playlistsError && playlists.length > 0 && (
-                <div className="playlists-row">
-                  {playlists.map((playlist) => (
-                    <PlaylistCard key={playlist._id} playlist={playlist} />
-                  ))}
-                </div>
-              )}
+              {!playlistsLoading &&
+                !playlistsError &&
+                playlists?.length > 0 && (
+                  <div className="playlists-row">
+                    {playlists.map((playlist) => (
+                      <PlaylistCard key={playlist._id} playlist={playlist} />
+                    ))}
+                  </div>
+                )}
             </section>
           </>
         )}
