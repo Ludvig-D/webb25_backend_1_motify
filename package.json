@@ -1,0 +1,25 @@
+{
+  "name": "webb25_backend_1_motify",
+  "version": "1.0.0",
+  "description": "**Implementation task (playlist sharing):** [docs/SHARE_SYSTEM.md](docs/SHARE_SYSTEM.md)",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "docker compose up --build",
+    "prod": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ludvig-D/webb25_backend_1_motify.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ludvig-D/webb25_backend_1_motify/issues"
+  },
+  "homepage": "https://github.com/Ludvig-D/webb25_backend_1_motify#readme"
+}
