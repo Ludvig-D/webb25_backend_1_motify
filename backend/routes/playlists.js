@@ -2,6 +2,7 @@ import { Router } from 'express';
 import Playlist from '../models/Playlist.js';
 import { requireAuth } from '../middleware/auth.js';
 import { isPlaylistOwner } from '../middleware/ownership.js';
+import User from '../models/User.js';
 
 const router = Router();
 
@@ -71,11 +72,10 @@ router.post('/my', requireAuth, async (req, res) => {
 
 router.put('/my/:id', requireAuth, isPlaylistOwner, async (req, res) => {
   try {
-    const playlist = await Playlist.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true },
-    )
+    const playlist = await Playlist.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    })
       .populate('songs', 'title artist durationSeconds')
       .populate('user', 'email');
     if (!playlist) {
@@ -103,20 +103,41 @@ router.delete('/my/:id', requireAuth, isPlaylistOwner, async (req, res) => {
   }
 });
 
+router.get('/shared-with-me', requireAuth, async (req, res) => {
+  const { id } = req.user;
+  try {
+    const allSharedPlaylists = await Playlist.find({
+      sharedUsers: { $in: [id] },
+    }).populate('songs');
+    console.log(allSharedPlaylists);
+    res.status(200).json(allSharedPlaylists);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: err });
+  }
+});
+
 /**
  * Get a publicly accessible playlist by ID (user must be null on the document).
  * Must be registered after /my so /my is not interpreted as an id.
  */
 router.get('/:id', async (req, res) => {
-  if(req.params.id.startsWith('shared-with-') || req.params.id.startsWith('my/')) {
-    return res.status(404).json({ error: 'Endpoint not implemented correctly' });
+  if (
+    req.params.id.startsWith('shared-with-') ||
+    req.params.id.startsWith('my/')
+  ) {
+    return res
+      .status(404)
+      .json({ error: 'Endpoint not implemented correctly' });
   }
   try {
     const playlist = await Playlist.findOne({
       _id: req.params.id,
       user: null,
-    })
-      .populate({ path: 'songs', populate: { path: 'artist', select: 'name' } });
+    }).populate({
+      path: 'songs',
+      populate: { path: 'artist', select: 'name' },
+    });
     if (!playlist) {
       console.error('Playlist by ID: Playlist not found');
       return res.status(404).json({ error: 'Playlist not found' });
@@ -127,6 +148,51 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+router.patch(
+  '/my/:id/share',
+  requireAuth,
+  isPlaylistOwner,
+  async (req, res) => {
+    const { id: playlistId } = req.params;
+    const { id, email } = req.user;
+    const { email: shareEmail } = req.body;
+    try {
+      if (!shareEmail)
+        return res.status(400).json({ message: 'Missing shared email' });
+
+      const shareUser = await User.findOne({ email: shareEmail });
+      if (!shareUser)
+        return res.status(400).json({ message: 'Faild to find user' });
+      console.log(shareUser);
+
+      if (shareEmail === email)
+        return res
+          .status(400)
+          .json({ message: 'Cant add yourself to shared list' });
+
+      const userAlreadyAdded = await Playlist.findOne({
+        _id: playlistId,
+        sharedUsers: { $in: [shareUser._id] },
+      });
+      if (userAlreadyAdded)
+        return res.status(400).json({ message: 'User already shared with' });
+
+      const share = await Playlist.findByIdAndUpdate(
+        playlistId,
+        {
+          $push: { sharedUsers: shareUser._id },
+        },
+        { new: true },
+      );
+
+      res.status(200).json(share);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ error: err });
+    }
+  },
+);
 
 //TODO: add routes for
 //? sahring a playlist with a user based on their email /playlists/my/:id/share

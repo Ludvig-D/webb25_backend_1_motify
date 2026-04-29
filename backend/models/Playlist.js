@@ -9,15 +9,23 @@ const playlistSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
-  songs: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Song'
-  }],
+  songs: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Song',
+    },
+  ],
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     default: null,
   },
+  sharedUsers: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+  ],
 });
 
 export default mongoose.model('Playlist', playlistSchema);
