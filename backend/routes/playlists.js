@@ -109,7 +109,6 @@ router.get('/shared-with-me', requireAuth, async (req, res) => {
     const allSharedPlaylists = await Playlist.find({
       sharedUsers: { $in: [id] },
     }).populate('songs');
-    console.log(allSharedPlaylists);
     res.status(200).json(allSharedPlaylists);
   } catch (err) {
     console.log(err);
@@ -164,7 +163,6 @@ router.patch(
       const shareUser = await User.findOne({ email: shareEmail });
       if (!shareUser)
         return res.status(400).json({ message: 'Faild to find user' });
-      console.log(shareUser);
 
       if (shareEmail === email)
         return res
