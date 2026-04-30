@@ -160,7 +160,9 @@ router.patch(
       if (!shareEmail)
         return res.status(400).json({ message: 'Missing shared email' });
 
-      const shareUser = await User.findOne({ email: shareEmail });
+      const shareUser = await User.findOne({
+        email: shareEmail.toLowerCase().trim(),
+      });
       if (!shareUser)
         return res.status(400).json({ message: 'Faild to find user' });
 
@@ -173,7 +175,7 @@ router.patch(
         _id: playlistId,
         sharedUsers: { $in: [shareUser._id] },
       });
-      if (userAlreadyAdded)
+      if (!userAlreadyAdded)
         return res.status(400).json({ message: 'User already shared with' });
 
       const share = await Playlist.findByIdAndUpdate(

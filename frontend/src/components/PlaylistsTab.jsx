@@ -280,6 +280,7 @@ export default function PlaylistsTab() {
       setFormError(error);
       console.log(error);
     } finally {
+      setShareFormOpen(false);
       setSubmitting(false);
     }
   };
