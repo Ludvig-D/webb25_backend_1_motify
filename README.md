@@ -1,5 +1,7 @@
 # Motify
 
+> School project in Backend 1 at **Nackademin – Webb25**.
+
 **Implementation task (playlist sharing):** [docs/SHARE_SYSTEM.md](docs/SHARE_SYSTEM.md)
 
 ---
